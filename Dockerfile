@@ -4,12 +4,25 @@
 #WORKDIR /app/
 #CMD make
 
-FROM node:18-alpine
+# --- 1단계: Build 단계 ---
+FROM node:18-alpine AS builder
+
 WORKDIR /app
-# 1. package.json 복사 (캐싱을 위해)
-COPY package.json package-lock.json ./ 
-# 2. 의존성 설치
-RUN npm install 
-# 3. 나머지 파일 복사
+
+# package.json 먼저 복사 → node_modules 캐싱
+COPY package*.json ./
+RUN npm install --only=production
+
+# 나머지 소스 복사
 COPY . .
+
+# --- 2단계: 실행 단계 ---
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY --from=builder /app /app
+
+EXPOSE 3000           
+
 CMD ["npm", "start"]

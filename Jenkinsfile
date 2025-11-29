@@ -1,45 +1,26 @@
-pipeline {
-
-    agent {
-        docker {
-            image 'node:18-alpine'
-
-            args '-v /var/run/docker.sock:/var/run/docker.sock' 
-        }
-    }
-    
-
-    stages {
+node {
+        def app
         stage('Clone repository') {
-            steps {
-
                 git 'https://github.com/2anizirong/BookMoa.git'
-            }
         }
-
-        stage('Build image') {
+       stage('Build Docker image') {
             steps {
                 script {
-
-                    app = docker.build("kimian/test", "-f dockerfiles/Dockerfile .")
+                    echo "Building Docker image..."
+                    app = docker.build("kimian/test:${env.BUILD_ID}", "-f dockerfiles/Dockerfile .")
                 }
             }
         }
-
         stage('Test image') {
             steps {
-
-                sh "docker run --rm kimian/test npm test"
+                echo "Running tests inside the image..."
+                sh "docker run --rm kimian/test:${env.BUILD_ID} npm test"
             }
         }
-
         stage('Push image') {
-            steps {
-
-                docker.withRegistry('https://registry.hub.docker.com') {
-  	              app.push("latest")
+                docker.withRegistry('https://registry.hub.docker.com', 'kimian') {
+                        app.push("${env.BUILD_NUMBER}")
+                        app.push("latest")
                 }
-            }
         }
-    }
 }
