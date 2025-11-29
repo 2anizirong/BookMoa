@@ -6,12 +6,11 @@ node {
 	stage('Build image') {
                 app = docker.build("kimian/test", "-f dockerfiles/Dockerfile .")
         }
-        stage('Test image') {
-            steps {
-                echo "Running tests inside the image..."
-                sh "docker run --rm kimian/test:${env.BUILD_ID} npm test"
-            }
-        }
+	stage('Test image') {
+        	app.inside {
+            		sh 'make test'
+        	}
+    	}
         stage('Push image') {
                 docker.withRegistry('https://registry.hub.docker.com', 'kimian') {
                         app.push("${env.BUILD_NUMBER}")
