@@ -1,22 +1,6 @@
-# --- 1단계: Build 단계 ---
-FROM node:18-alpine AS builder
+FROM ubuntu:20.04
+RUN apt-get update && apt-get -y install build-essential && mkdir –p /app
+COPY . /app/
+WORKDIR /app/
+CMD make
 
-WORKDIR /app
-
-# package.json 먼저 복사 → node_modules 캐싱
-COPY package*.json ./
-RUN npm install --only=production
-
-# 나머지 소스 복사
-COPY . .
-
-# --- 2단계: 실행 단계 ---
-FROM node:18-alpine
-
-WORKDIR /app
-
-COPY --from=builder /app /app
-
-EXPOSE 80           
-
-CMD ["npm", "start"]
