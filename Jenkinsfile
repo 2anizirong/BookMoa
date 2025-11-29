@@ -4,7 +4,7 @@ node {
 		git 'https://github.com/2anizirong/BookMoa.git'
 	}
 	stage('Build image') {
-		app = docker.build("kimian/test", "-f dockerfiles/Dockerfile .") 
+		app = docker.build("kimian/test", ".")
 	}
 	stage('Test image') {
 		app.inside {

@@ -6,6 +6,10 @@
 
 FROM node:18-alpine
 WORKDIR /app
-RUN npm install
+# 1. package.json 복사 (캐싱을 위해)
+COPY package.json package-lock.json ./ 
+# 2. 의존성 설치
+RUN npm install 
+# 3. 나머지 파일 복사
 COPY . .
 CMD ["npm", "start"]
