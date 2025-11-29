@@ -3,13 +3,8 @@ node {
         stage('Clone repository') {
                 git 'https://github.com/2anizirong/BookMoa.git'
         }
-       stage('Build Docker image') {
-            steps {
-                script {
-                    echo "Building Docker image..."
-                    app = docker.build("kimian/test:${env.BUILD_ID}", "-f dockerfiles/Dockerfile .")
-                }
-            }
+	stage('Build image') {
+                app = docker.build("kimian/test", "-f dockerfiles/Dockerfile .")
         }
         stage('Test image') {
             steps {
