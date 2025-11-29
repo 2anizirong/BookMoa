@@ -7,9 +7,10 @@ node {
 		app = docker.build("kimian/test", "-f dockerfiles/Dockerfile .")
 	}
 	stage('Test image') {
-		app.inside {
-			sh 'npm test'
-		}
+		steps {
+     			// 빌드된 이미지를 사용하여 직접 npm test 명령을 실행
+        		sh "docker run --rm kimian/test npm test"
+    }
 	}
 	stage('Push image') {
 		docker.withRegistry('https://registry.hub.docker.com', 'kimian') {
